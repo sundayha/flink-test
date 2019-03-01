@@ -41,7 +41,7 @@ public class WatermarkTest {
         // 运行环境设置为事件时间
         environment.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
-        environment.setParallelism(1);
+        environment.setParallelism(2);
 
         // 从 socket 中读取消息
         DataStream<String> socketDataStream = environment.socketTextStream("localhost", 9000);
