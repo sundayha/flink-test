@@ -17,6 +17,7 @@ public class WordCount {
 
         StreamExecutionEnvironment see = StreamExecutionEnvironment.getExecutionEnvironment();
 
+        // 从 socket 中读取源
         DataStream<String> text = see.socketTextStream("localhost", 9000);
 
         DataStream<Tuple2<String, Integer>> wordCount = text.flatMap((FlatMapFunction<String, Tuple2<String, Integer>>) (value, out) -> {

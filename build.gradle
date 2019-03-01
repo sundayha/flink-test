@@ -23,6 +23,10 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
 
+    // https://mvnrepository.com/artifact/org.objenesis/objenesis
+    testCompile group: 'org.objenesis', name: 'objenesis', version: '3.0.1'
+
+
 }
 
 //configurations {
