@@ -41,6 +41,7 @@ public class WatermarkTest {
         // 运行环境设置为事件时间
         environment.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
+        // 在并发的场景下，如果窗口有数据，并且每条线程的 water mark 都要大于 window end time 这时候窗口才会被触发。
         environment.setParallelism(2);
 
         // 从 socket 中读取消息
@@ -64,17 +65,14 @@ public class WatermarkTest {
         DataStream<Message> waterMarkDataStream = messageDataStream.assignTimestampsAndWatermarks(new AssignerWithPeriodicWatermarks<Message>() {
 
             // 延迟时间
-            Long delay = 3500L;
+            Long delay = 0L;
             // 当前最大时间戳
             Long currentMaxTimestamp = 0L;
-            // 水位
-            Watermark watermark;
 
             @Override
             public Watermark getCurrentWatermark() {
                 // 取事件时间的最大值 - 延迟时间的差作为水位的参考
-                watermark = new Watermark(currentMaxTimestamp - delay);
-                return watermark;
+                return new Watermark(currentMaxTimestamp - delay);
             }
 
             @Override
@@ -83,8 +81,7 @@ public class WatermarkTest {
                 System.out.println("线程号：" + Thread.currentThread().getId() +
                         " | 当前最大时间戳：".concat(toStrDate(currentMaxTimestamp))
                                 .concat(" | 事件时间：").concat(toStrDate(element.getDate()))
-                                .concat(" | 水印日期：").concat(toStrDate(watermark.getTimestamp())
-                                .concat(" | 水印：")).concat(watermark.toString())
+                                .concat(" | 水印日期：").concat(toStrDate(getCurrentWatermark().getTimestamp()))
                                 .concat(" | 消息：").concat(element.getMsg())
                                 .concat(" | 是否延迟：").concat(currentMaxTimestamp > element.getDate() ? "是" : "否")
                 );
