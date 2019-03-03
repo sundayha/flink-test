@@ -19,6 +19,8 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * @author 张博【zhangb@lianliantech.cn】
+ *
+ * nc -lk 9000
  */
 public class WatermarkTest {
 
