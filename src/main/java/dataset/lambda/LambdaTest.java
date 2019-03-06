@@ -1,4 +1,4 @@
-package lambda;
+package dataset.lambda;
 
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.ExecutionEnvironment;

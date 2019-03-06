@@ -1,4 +1,4 @@
-package readcsv;
+package dataset.readcsv;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;

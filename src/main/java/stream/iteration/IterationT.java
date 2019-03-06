@@ -1,4 +1,4 @@
-package iteration;
+package stream.iteration;
 
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;

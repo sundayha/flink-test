@@ -19,7 +19,7 @@ public class NumSum {
         // 从 socket 中读取数据
         DataStream<String> streamSource = see.socketTextStream("localhost", 9000);
 
-        // 将输入的字符串数字转换成一元组的 integer 类型，并指定返回类型，（因为 java 的 lambda 表达式会擦出变量的属性，所以需要显示的标注返回值类型）
+        // 将输入的字符串数字转换成一元组的 integer 类型，并指定返回类型，（因为 java 的 dataset.lambda 表达式会擦出变量的属性，所以需要显示的标注返回值类型）
         DataStream<Tuple1<Integer>> tuple1DataStream = streamSource
                 .map(v -> Tuple1.of(Integer.parseInt(v)))
                 .returns(Types.TUPLE(Types.INT));

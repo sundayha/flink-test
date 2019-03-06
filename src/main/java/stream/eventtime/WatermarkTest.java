@@ -31,7 +31,7 @@ public class WatermarkTest {
      * @apiNote 毫秒转日期字符串
      * @return string
      */
-    private static String toStrDate(Long date) {
+    public static String toStrDate(Long date) {
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSS");
         return dateFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(date), ZoneId.systemDefault()));
     }
