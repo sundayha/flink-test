@@ -3,18 +3,18 @@ package dataset.readcsv;
 /**
  * @author 张博【zhangb@lianliantech.cn】
  */
-public class WaferHead {
+public class WaferHead implements Comparable<WaferHead> {
 
-    private String id;
+    private Integer id;
     private String waferId;
     private String path;
     private String state;
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -40,5 +40,10 @@ public class WaferHead {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    @Override
+    public int compareTo(WaferHead o) {
+        return this.id.compareTo(o.id);
     }
 }
