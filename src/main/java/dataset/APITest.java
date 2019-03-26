@@ -5,6 +5,7 @@ import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.utils.DataSetUtils;
 import org.apache.flink.util.Collector;
 import stream.eventtime.WatermarkTest;
 
@@ -20,7 +21,7 @@ public class APITest {
 
         ExecutionEnvironment environment = ExecutionEnvironment.getExecutionEnvironment();
 
-        environment.setParallelism(2);
+        environment.setParallelism(3);
 
         DataSet<String> text = environment.fromElements("i love you ! you not love me !");
 
@@ -60,7 +61,7 @@ public class APITest {
         });
 
         //sortT(sortDataSet);
-        projectT(tuple2DataSet);
+        zipT(tuple2DataSet);
     }
 
     /**
@@ -233,5 +234,12 @@ public class APITest {
         dataSet.maxBy(1).print();
         System.out.println("dataset max");
         dataSet.minBy(1).print();
+
+    }
+
+    public static void zipT(DataSet<Tuple2<String, Integer>> tuple2DataSet) throws Exception {
+        DataSet<Tuple2<Long, Tuple2<String, Integer>>> dataSet = DataSetUtils.zipWithIndex(tuple2DataSet);
+        DataSetUtils.zipWithUniqueId(dataSet).print();
+        //dataSet.print();
     }
 }

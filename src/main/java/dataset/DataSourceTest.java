@@ -145,8 +145,8 @@ public class DataSourceTest {
                 return 0;
             }
         }, 0).sortPartition(0, Order.DESCENDING);
-
-        tuple4DataSet1.writeAsCsv(writeFilePath, "\n ", ",", FileSystem.WriteMode.OVERWRITE).setParallelism(1);
+        //tuple4DataSet1.print();
+        tuple4DataSet1.writeAsCsv(writeFilePath, "\n", ",", FileSystem.WriteMode.OVERWRITE).setParallelism(1);
 
 
     }
