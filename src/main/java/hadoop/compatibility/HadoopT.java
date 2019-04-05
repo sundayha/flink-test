@@ -1,13 +1,10 @@
 package hadoop.compatibility;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.hadoop.mapreduce.HadoopOutputFormat;
-import org.apache.flink.api.java.io.PrimitiveInputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.hadoopcompatibility.mapred.HadoopMapFunction;
 import org.apache.flink.util.Collector;
 import org.apache.hadoop.fs.Path;
@@ -29,9 +26,8 @@ public class HadoopT {
     public static void main(String[] args) throws Exception {
 
         ExecutionEnvironment executionEnvironment = ExecutionEnvironment.getExecutionEnvironment();
-        executionEnvironment.setParallelism(1);
 
-        uploadFile(executionEnvironment);
+        outFile(executionEnvironment);
 
         executionEnvironment.execute();
     }
@@ -59,16 +55,16 @@ public class HadoopT {
         hadoopOF.getConfiguration().set("dfs.client.block.write.replace-datanode-on-failure.enable", "true");
         hadoopOF.getConfiguration().set("dfs.client.block.write.replace-datanode-on-failure.policy","NEVER");
         hadoopOF.getConfiguration().set("dfs.datanode.max.transfer.threads","8192");
-        result.output(hadoopOF);
+        result.output(hadoopOF).setParallelism(1);
     }
-
-    private static void uploadFile(ExecutionEnvironment executionEnvironment) throws Exception {
-        TypeInformation<Byte> typeInfo = TypeExtractor.createTypeInfo(Byte.class);
-
-        PrimitiveInputFormat<Byte> primitiveInputFormat = new PrimitiveInputFormat<>(new org.apache.flink.core.fs.Path("/Users/zhangbo/Downloads/flinkOut//SI10953-14_X_77_Y_55.jpg"), Byte.class);
-
-        DataSet<Byte> dataSet = executionEnvironment.createInput(primitiveInputFormat, typeInfo);
-
-        dataSet.print();
-    }
+    //
+    //private static void uploadFile(ExecutionEnvironment executionEnvironment) throws Exception {
+    //    TypeInformation<Byte> typeInfo = TypeExtractor.createTypeInfo(Byte.class);
+    //
+    //    PrimitiveInputFormat<Byte> primitiveInputFormat = new PrimitiveInputFormat<>(new org.apache.flink.core.fs.Path("/Users/zhangbo/Downloads/flinkOut//SI10953-14_X_77_Y_55.jpg"), Byte.class);
+    //
+    //    DataSet<Byte> dataSet = executionEnvironment.createInput(primitiveInputFormat, typeInfo);
+    //
+    //    dataSet.print();
+    //}
 }
