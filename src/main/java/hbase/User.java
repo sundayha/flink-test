@@ -6,6 +6,15 @@ package hbase;
 @HBaseModel(tableName = "user")
 public class User {
 
+    public User() {}
+
+    public User(String rowKey, String name, String sex, String age) {
+        this.rowKey = rowKey;
+        this.name = name;
+        this.sex = sex;
+        this.age = age;
+    }
+
     @HBaseModelProperty(family = "rowKey", qualifier = "rowKey")
     private String rowKey;
     @HBaseModelProperty(family = "userInfo", qualifier = "name")
@@ -59,6 +68,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "User".concat("rowkey: ").concat(getRowKey()).concat(" name: ").concat(getName()).concat(" age: ").concat(getAge()).concat(" sex: ").concat(getSex()) ;
+        return "User".concat("rowkey: ").concat(getRowKey()).concat(", name: ").concat(getName()).concat(", age: ").concat(getAge()).concat(", sex: ").concat(getSex()) ;
     }
 }
