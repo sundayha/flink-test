@@ -4,6 +4,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -54,9 +55,11 @@ public class HBaseMapper {
         //        }
         //);
 
+
+
+        deleteByRowKey("user", "104");
+
     }
-
-
 
     /**
      * 创建人：张博【zhangb@novadeep.com】
@@ -241,6 +244,20 @@ public class HBaseMapper {
         }
 
         return results;
+    }
+
+    public static void deleteByRowKey(String tableName, String rowKey) {
+
+        try (Connection connection = initHBase(); Table table = connection.getTable(TableName.valueOf(tableName))) {
+
+            Delete delete = new Delete(Bytes.toBytes(rowKey));
+
+            table.delete(delete);
+            //tTable.delete(delete);
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
     }
 
     /**

@@ -7,7 +7,7 @@ import org.junit.Test;
  */
 public class HBaseT {
 
-    private User user = new User("101", "顶呱呱，跨啦啦", "男", "20");
+    private User user = new User("106", "顶呱呱，跨啦啦", "男", "20");
 
     @Test
     public void createTableType1() {
@@ -50,6 +50,11 @@ public class HBaseT {
                     System.out.println(s.getSex());
                 }
         );
+    }
+
+    @Test
+    public void deleteByRowKey() {
+        HBaseMapper.deleteByRowKey("user", "103");
     }
 
     @Test
