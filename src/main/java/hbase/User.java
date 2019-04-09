@@ -23,16 +23,6 @@ public class User {
     private String sex;
     @HBaseModelProperty(family = "userInfo", qualifier = "age")
     private String age;
-    //@HBaseModelProperty(family = "userInfo", qualifier = "hobby")
-    //private List<String> hobby;
-
-    //public List<String> getHobby() {
-    //    return hobby;
-    //}
-    //
-    //public void setHobby(List<String> hobby) {
-    //    this.hobby = hobby;
-    //}
 
     public String getRowKey() {
         return rowKey;
