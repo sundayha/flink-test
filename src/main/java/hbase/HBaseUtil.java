@@ -84,7 +84,14 @@ public class HBaseUtil {
                 continue;
             }
 
-            put.addColumn(Bytes.toBytes(hBaseModelPropertyAnnotation.family()), Bytes.toBytes(hBaseModelPropertyAnnotation.qualifier()), Bytes.toBytes(fiele1.get(obj).toString()));
+            // 如果成员属性为 byte[]，可能代表为文件的字节数组
+            if (fiele1.getType().getTypeName().equals("byte[]")) {
+
+                put.addColumn(Bytes.toBytes(hBaseModelPropertyAnnotation.family()), Bytes.toBytes(hBaseModelPropertyAnnotation.qualifier()), (byte[])fiele1.get(obj));
+            } else {
+
+                put.addColumn(Bytes.toBytes(hBaseModelPropertyAnnotation.family()), Bytes.toBytes(hBaseModelPropertyAnnotation.qualifier()), Bytes.toBytes(fiele1.get(obj).toString()));
+            }
 
             System.out.println("family: " + hBaseModelPropertyAnnotation.family() + " qualifier: " + hBaseModelPropertyAnnotation.qualifier() + " value: " + fiele1.get(obj));
         }
@@ -140,7 +147,14 @@ public class HBaseUtil {
                 method.invoke(t, Bytes.toString(result.getRow()));
             } else {
 
-                method.invoke(t, Bytes.toString(result.getValue(Bytes.toBytes(hBaseModelProperty.family()), Bytes.toBytes(hBaseModelProperty.qualifier()))));
+                // 如果成员属性为 byte[]，可能代表为文件的字节数组
+                if (field.getType().getTypeName().equals("byte[]")) {
+
+                    method.invoke(t, (Object) result.getValue(Bytes.toBytes(hBaseModelProperty.family()), Bytes.toBytes(hBaseModelProperty.qualifier())));
+                } else {
+
+                    method.invoke(t, Bytes.toString(result.getValue(Bytes.toBytes(hBaseModelProperty.family()), Bytes.toBytes(hBaseModelProperty.qualifier()))));
+                }
             }
         }
 

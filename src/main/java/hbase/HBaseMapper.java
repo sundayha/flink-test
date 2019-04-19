@@ -27,36 +27,6 @@ public class HBaseMapper {
         user.setSex("男");
         user.setName("顶呱呱，跨啦啦");
 
-        //createTable("user", "information");
-        //createTable(user);
-        //insert("user", user);
-
-        //insertSelective
-
-        //deleteTable("use111r");
-
-        //getAllData("user", User.class).forEach(
-        //        s -> {
-        //            System.out.println(s.getRowKey());
-        //            System.out.println(s.getName());
-        //            System.out.println(s.getSex());
-        //            System.out.println(s.getAge());
-        //            //System.out.println(s.toString());
-        //            System.out.println("==========");
-        //        }
-        //);
-
-        //getResultByRowKey("user", "100", User.class).forEach(
-        //        s -> {
-        //            System.out.println(s.getRowKey());
-        //            System.out.println(s.getName());
-        //            System.out.println(s.getSex());
-        //            System.out.println(s.getAge());
-        //        }
-        //);
-
-
-
         deleteByRowKey("user", "104");
 
     }
@@ -123,14 +93,12 @@ public class HBaseMapper {
     /**
      * 创建人：张博【zhangb@novadeep.com】
      * 时间：2019-04-05 10:44
-     * @param obj 表实体
+     * @param aClass 表实体 class
      * @apiNote 根据实体上的注解来生成表
      */
-    public static <T> void createTable(T obj) {
+    public static <T> void createTable(Class<T> aClass) {
 
         try (Connection connection = initHBase(); Admin admin = connection.getAdmin()) {
-
-            Class<?> aClass = obj.getClass();
 
             if (aClass.isAnnotationPresent(HBaseModel.class)) {
 
@@ -161,6 +129,21 @@ public class HBaseMapper {
 
     /**
      * 创建人：张博【zhangb@novadeep.com】
+     * 时间：2019-04-10 13:47
+     * @param aClass 表 class
+     * @apiNote 覆盖表。先删除，再创建
+     */
+    public static <T> void createTableOverwrite(Class<T> aClass) {
+        try {
+            deleteTable(aClass);
+            createTable(aClass);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 创建人：张博【zhangb@novadeep.com】
      * 时间：2019-04-05 11:07
      * @param tableName 表名
      * @param obj 要插入 hBase 的实体对象
@@ -176,38 +159,63 @@ public class HBaseMapper {
         }
     }
 
-    public static <T> void insertSelective(String tableName, T obj) throws Exception {
+    /**
+     * 创建人：张博【zhangb@novadeep.com】
+     * 时间：2019-04-10 13:29
+     * @param obj 要插入 hBase 的实体对象
+     * @apiNote 不需要指定表名，直接从注解中拿到表名，传递过来的类中必须带有 HBaseModel 注解的 tableName
+     */
+    public static <T> void insert(T obj) {
 
+        Class<?> aClass = obj.getClass();
+
+        if (aClass.isAnnotationPresent(HBaseModel.class)) {
+
+            HBaseModel hBaseModel = aClass.getAnnotation(HBaseModel.class);
+
+            String tableName = hBaseModel.tableName();
+
+            try (Connection connection = initHBase(); Table table = connection.getTable(TableName.valueOf(tableName))) {
+
+                table.put(HBaseUtil.modelToPut(obj));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
      * 创建人：张博【zhangb@novadeep.com】
      * 时间：2019-04-08 09:52
-     * @param tableName 表名
      * @param aClass 从 hBase 转换出来的实体对象
      * @apiNote 获取表的全部数据。并转换成 List<T>。尽量少使用该方法。因为表的数据量巨大。
      * @return List<T>
      */
-    public static <T> List<T> getAllData(String tableName, Class<T> aClass) {
+    public static <T> List<T> getAllData(Class<T> aClass) {
 
         List<T> results = new ArrayList<>();
 
-        try (Connection connection = initHBase(); Table table = connection.getTable(TableName.valueOf(tableName))) {
+        if (aClass.isAnnotationPresent(HBaseModel.class)) {
 
-            Scan scan = new Scan();
-            // 扫描全表
-            ResultScanner resultScanner = table.getScanner(scan);
+            HBaseModel hBaseModel = aClass.getAnnotation(HBaseModel.class);
 
-            for (Result result : resultScanner) {
+            try (Connection connection = initHBase(); Table table = connection.getTable(TableName.valueOf(hBaseModel.tableName()))) {
 
-                if (!result.isEmpty()) {
-                    // 取出每一行的数据
-                    results.add(HBaseUtil.resultToModel(result, aClass));
+                Scan scan = new Scan();
+                // 扫描全表
+                ResultScanner resultScanner = table.getScanner(scan);
+
+                for (Result result : resultScanner) {
+
+                    if (!result.isEmpty()) {
+                        // 取出每一行的数据，添加到 list 中
+                        results.add(HBaseUtil.resultToModel(result, aClass));
+                    }
                 }
-            }
-        } catch (Exception e) {
+            } catch (Exception e) {
 
-            e.printStackTrace();
+                e.printStackTrace();
+            }
         }
 
         return results;
@@ -216,34 +224,67 @@ public class HBaseMapper {
     /**
      * 创建人：张博【zhangb@novadeep.com】
      * 时间：2019-04-08 10:12
-     * @param tableName 表名
      * @param rowKey 行主键
      * @param aClass 从 hBase 转换出来的实体对象
      * @apiNote 根据主键得到数据
      * @return List<T>
      */
-    public static <T> List<T> getListByRowKey(String tableName, String rowKey, Class<T> aClass) {
+    public static <T> List<T> getListByRowKey(String rowKey, Class<T> aClass) {
 
         List<T> results = new ArrayList<>();
 
-        try (Connection connection = initHBase(); Table table = connection.getTable(TableName.valueOf(tableName))) {
+        if (aClass.isAnnotationPresent(HBaseModel.class)) {
 
-            Get get = new Get(rowKey.getBytes());
+            HBaseModel hBaseModel = aClass.getAnnotation(HBaseModel.class);
 
-            if (!get.isCheckExistenceOnly()) {
+            try (Connection connection = initHBase(); Table table = connection.getTable(TableName.valueOf(hBaseModel.tableName()))) {
 
-                Result result = table.get(get);
+                Get get = new Get(Bytes.toBytes(rowKey));
 
-                if (!result.isEmpty()) {
+                if (!get.isCheckExistenceOnly()) {
 
-                    results.add(HBaseUtil.resultToModel(result, aClass));
+                    Result result = table.get(get);
+
+                    if (!result.isEmpty()) {
+
+                        results.add(HBaseUtil.resultToModel(result, aClass));
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         return results;
+    }
+
+    public static <T> T getObjectByRowKey(String rowKey, Class<T> aClass) {
+
+        T t = null;
+
+        if (aClass.isAnnotationPresent(HBaseModel.class)) {
+
+            HBaseModel hBaseModel = aClass.getAnnotation(HBaseModel.class);
+
+            try (Connection connection = initHBase(); Table table = connection.getTable(TableName.valueOf(hBaseModel.tableName()))) {
+
+                Get get = new Get(Bytes.toBytes(rowKey));
+
+                if (!get.isCheckExistenceOnly()) {
+
+                    Result result = table.get(get);
+
+                    if (!result.isEmpty()) {
+
+                        t = HBaseUtil.resultToModel(result, aClass);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return t;
     }
 
     public static void deleteByRowKey(String tableName, String rowKey) {
@@ -268,15 +309,40 @@ public class HBaseMapper {
      */
     public static void deleteTable(String tableName) {
 
-        TableName tablename = TableName.valueOf(tableName);
+        deleteTable(TableName.valueOf(tableName));
+    }
+
+    /**
+     * 创建人：张博【zhangb@novadeep.com】
+     * 时间：2019-04-10 13:40
+     * @param aClass 要删除表的实体 class
+     * @apiNote 在 hBase 中删除该表
+     */
+    public static <T> void deleteTable(Class<T> aClass) {
+
+        HBaseModel hBaseModel = aClass.getDeclaredAnnotation(HBaseModel.class);
+
+        if (aClass.isAnnotationPresent(HBaseModel.class)) {
+
+            deleteTable(TableName.valueOf(hBaseModel.tableName()));
+        }
+    }
+
+    /**
+     * 创建人：张博【zhangb@novadeep.com】
+     * 时间：2019-04-10 13:41
+     * @param tableName TableName 的对象
+     * @apiNote 为删除表提供的公共方法
+     */
+    private static void deleteTable(TableName tableName) {
 
         try (Connection connection = initHBase(); Admin admin = connection.getAdmin()) {
 
-            if (admin.tableExists(tablename)) {
+            if (admin.tableExists(tableName)) {
                 // 先禁用表
-                admin.disableTable(tablename);
+                admin.disableTable(tableName);
                 // 再删除表
-                admin.deleteTable(tablename);
+                admin.deleteTable(tableName);
             }
         } catch (Exception e) {
             e.printStackTrace();
