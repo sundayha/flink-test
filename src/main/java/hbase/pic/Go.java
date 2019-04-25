@@ -27,11 +27,11 @@ public class Go {
                         svdPic.setRowKey(s.getName().split("\\.")[0]);
 
                         svdPic.setFile(FileUtils.readFileToByteArray(s.getAbsoluteFile()));
-
                         HBaseMapper.insert(svdPic);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 });
+
     }
 }

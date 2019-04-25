@@ -20,17 +20,6 @@ import java.util.concurrent.Executors;
  */
 public class HBaseMapper {
 
-    public static void main(String[] args) throws Exception {
-        User user = new User();
-        user.setRowKey("101");
-        user.setAge("29");
-        user.setSex("男");
-        user.setName("顶呱呱，跨啦啦");
-
-        deleteByRowKey("user", "104");
-
-    }
-
     /**
      * 创建人：张博【zhangb@novadeep.com】
      * 时间：2019-04-04 10:52
@@ -130,7 +119,7 @@ public class HBaseMapper {
     /**
      * 创建人：张博【zhangb@novadeep.com】
      * 时间：2019-04-10 13:47
-     * @param aClass 表 class
+     * @param aClass 实体 class
      * @apiNote 覆盖表。先删除，再创建
      */
     public static <T> void createTableOverwrite(Class<T> aClass) {
@@ -187,7 +176,7 @@ public class HBaseMapper {
     /**
      * 创建人：张博【zhangb@novadeep.com】
      * 时间：2019-04-08 09:52
-     * @param aClass 从 hBase 转换出来的实体对象
+     * @param aClass 从 hBase 转换出来的实体 class
      * @apiNote 获取表的全部数据。并转换成 List<T>。尽量少使用该方法。因为表的数据量巨大。
      * @return List<T>
      */
@@ -225,8 +214,8 @@ public class HBaseMapper {
      * 创建人：张博【zhangb@novadeep.com】
      * 时间：2019-04-08 10:12
      * @param rowKey 行主键
-     * @param aClass 从 hBase 转换出来的实体对象
-     * @apiNote 根据主键得到数据
+     * @param aClass 从 hBase 转换出来的实体 class
+     * @apiNote 根据主键得到 list 数据
      * @return List<T>
      */
     public static <T> List<T> getListByRowKey(String rowKey, Class<T> aClass) {
@@ -258,6 +247,14 @@ public class HBaseMapper {
         return results;
     }
 
+    /**
+     * 创建人：张博【zhangb@novadeep.com】
+     * 时间：2019-04-22 09:39
+     * @param rowKey 行主键
+     * @param aClass 从 hBase 转换出来的实体 class
+     * @apiNote 根据主键得到实体数据
+     * @return T
+     */
     public static <T> T getObjectByRowKey(String rowKey, Class<T> aClass) {
 
         T t = null;
@@ -287,14 +284,49 @@ public class HBaseMapper {
         return t;
     }
 
-    public static void deleteByRowKey(String tableName, String rowKey) {
+    /**
+     * 创建人：张博【zhangb@novadeep.com】
+     * 时间：2019-04-22 09:48
+     * @param tableName 表名
+     * @param rowKey 表主键
+     * @apiNote 根据 rowKey 删除行
+     */
+    public static void deleteRowByRowKey(String tableName, String rowKey) {
 
-        try (Connection connection = initHBase(); Table table = connection.getTable(TableName.valueOf(tableName))) {
+        deleteRowByRowKey(TableName.valueOf(tableName), rowKey);
+    }
+
+    /**
+     * 创建人：张博【zhangb@novadeep.com】
+     * 时间：2019-04-22 09:51
+     * @param aClass 从 hBase 中要删除行的实体 class
+     * @param rowKey 表主键
+     * @apiNote 根据 rowKey 删除行
+     */
+    public static <T> void deleteRowByRowKey(Class<T> aClass, String rowKey) {
+
+        HBaseModel hBaseModel = aClass.getDeclaredAnnotation(HBaseModel.class);
+
+        if (aClass.isAnnotationPresent(HBaseModel.class)) {
+
+            deleteRowByRowKey(TableName.valueOf(hBaseModel.tableName()), rowKey);
+        }
+    }
+
+    /**
+     * 创建人：张博【zhangb@novadeep.com】
+     * 时间：2019-04-22 09:53
+     * @param tableName TableName 对象
+     * @param rowKey 表主键
+     * @apiNote 合并删除行的公共方法
+     */
+    private static void deleteRowByRowKey(TableName tableName, String rowKey) {
+
+        try (Connection connection = initHBase(); Table table = connection.getTable(tableName)) {
 
             Delete delete = new Delete(Bytes.toBytes(rowKey));
 
             table.delete(delete);
-            //tTable.delete(delete);
         } catch (Exception e) {
 
             e.printStackTrace();

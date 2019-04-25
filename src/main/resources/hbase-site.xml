@@ -37,4 +37,29 @@
 	    <name>hbase.zookeeper.quorum</name>
 	    <value>master</value>
 	 </property>
+	<!-- 开启phoenix事务支持 -->
+	<property>
+		<name>phoenix.transactions.enabled</name>
+		<value>true</value>
+	</property>
+
+	<!-- 存储tx状态的快照目录 -->
+	<property>
+		<name>data.tx.snapshot.dir</name>
+		<value>/tmp/tephra/snapshots</value>
+	</property>
+
+	<!-- 事务超时时间 -->
+	<property>
+		<name>data.tx.timeout</name>
+		<value>60</value>
+	</property>
+	<property>
+		<name>phoenix.schema.isNamespaceMappingEnabled</name>
+		<value>true</value>
+	</property>
+	<property>
+		<name>phoenix.schema.mapSystemTablesToNamespace</name>
+		<value>true</value>
+	</property>
 </configuration>
