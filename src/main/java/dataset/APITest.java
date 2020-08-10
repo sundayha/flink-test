@@ -7,7 +7,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.DataSetUtils;
 import org.apache.flink.util.Collector;
-import stream.eventtime.WatermarkTest;
+//import stream.eventtime.WatermarkTest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -211,7 +211,7 @@ public class APITest {
             @Override
             public void reduce(Iterable<Tuple2<String, Long>> values, Collector<Tuple2<String, String>> out) throws Exception {
                 values.forEach(s -> {
-                    out.collect(new Tuple2<>(s.f0, WatermarkTest.toStrDate(s.f1)));
+                    //out.collect(new Tuple2<>(s.f0, WatermarkTest.toStrDate(s.f1)));
                 });
             }
         });
